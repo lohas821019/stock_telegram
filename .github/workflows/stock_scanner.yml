@@ -1,0 +1,57 @@
+name: Daily Stock Scanner
+
+on:
+  schedule:
+    # 每天台灣時間 21:00 (UTC 13:00) 自動執行
+    - cron: '0 13 * * *'
+  workflow_dispatch:
+    inputs:
+      market:
+        description: '選擇掃描市場 (all / tw / us)'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - tw
+          - us
+
+jobs:
+  stock-scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Prepare configuration
+        run: |
+          cp config.example.ini config.ini
+
+      - name: Run Taiwan Stock Scanner
+        if: ${{ github.event_name == 'schedule' || github.event.inputs.market == 'all' || github.event.inputs.market == 'tw' }}
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python main.py
+
+      - name: Run US Stock Scanner
+        if: ${{ github.event_name == 'schedule' || github.event.inputs.market == 'all' || github.event.inputs.market == 'us' }}
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python main_US.py

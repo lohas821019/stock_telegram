@@ -189,11 +189,11 @@ def load_settings() -> Settings:
     config = configparser.ConfigParser()
     config.read(CONFIG_FILE, encoding="utf-8")
 
-    try:
-        token = config["Telegram"]["token"]
-        chat_id = config["Telegram"]["chat_id"]
-    except KeyError as exc:
-        raise RuntimeError("config.ini 缺少 [Telegram] token 或 chat_id") from exc
+    telegram = config["Telegram"] if config.has_section("Telegram") else {}
+    token = os.getenv("TELEGRAM_BOT_TOKEN", telegram.get("token", ""))
+    chat_id = os.getenv("TELEGRAM_CHAT_ID", telegram.get("chat_id", ""))
+    if not token or not chat_id:
+        raise RuntimeError("請設定 TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID，或 config.ini 的 [Telegram]。")
 
     settings = config["Settings"] if "Settings" in config else {}
     return Settings(
