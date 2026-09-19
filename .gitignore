@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.bak
+venv/
+venv_py311_broken_backup/
+rsi_alert_state.json
+tw_stock_names_cache.json
+config.ini
+config.local.ini
+smc_dashboard.html
+smc_dashboard_assets/
