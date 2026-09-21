@@ -1,9 +1,10 @@
 name: Daily Stock Scanner
 
 on:
-  schedule:
-    # 每天台灣時間 21:00 (UTC 13:00) 自動執行
-    - cron: '0 13 * * *'
+  # 已暫停定時任務（改回由本地工作排程器執行）
+  # schedule:
+  #   # 每天台灣時間 21:00 (UTC 13:00) 自動執行
+  #   - cron: '0 13 * * *'
   workflow_dispatch:
     inputs:
       market:
